@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+import tldextract
 
 
 def get_page_title_content(bookmark_url):
@@ -17,3 +18,11 @@ def get_page_title_content(bookmark_url):
         return
     
     return title_content
+
+
+def extract_domain_name(bookmark_url):
+    extract_result = tldextract.extract(str(bookmark_url))
+    domain_name = extract_result.domain
+    capitalized_domain_name = domain_name.capitalize()
+    
+    return capitalized_domain_name

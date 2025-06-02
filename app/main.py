@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.models import Bookmark
-from app.utils import get_page_title_content
+from app.utils import extract_domain_name, get_page_title_content
 
 
 app = FastAPI()
@@ -13,5 +13,8 @@ def create_bookmark(bookmark: Bookmark):
         page_title_content = get_page_title_content(bookmark.url)
         if page_title_content:
             bookmark.title = page_title_content
-
+        else:
+            domain_name = extract_domain_name(bookmark.url)
+            bookmark.title = domain_name
+    
     return bookmark
