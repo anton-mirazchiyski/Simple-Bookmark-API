@@ -26,3 +26,9 @@ def extract_domain_name(bookmark_url):
     capitalized_domain_name = domain_name.capitalize()
     
     return capitalized_domain_name
+
+
+def find_specific_bookmarks(search_str, bookmarks):
+    found_bookmarks = [bookmark for bookmark in bookmarks if search_str in bookmark.title or search_str in str(bookmark.url)]
+
+    return found_bookmarks
