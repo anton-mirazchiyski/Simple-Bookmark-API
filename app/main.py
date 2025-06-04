@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.models import Bookmark
-from app.utils import extract_domain_name, find_specific_bookmarks, get_page_title_content
+from app.utils import extract_domain_name, find_specific_bookmarks_by_search_string, find_specific_bookmarks_by_tag_name, get_page_title_content
 from app.database import all_bookmarks
 
 
@@ -9,19 +9,23 @@ app = FastAPI()
 
 
 @app.get('/bookmarks/')
-def get_bookmarks(search: str | None = None):
-    if not search:
+def get_bookmarks(tag: str | None = None, search: str | None = None):
+    if not search and not tag:
         return [{'id': idx + 1, 'title': bookmark.title, 'url': str(bookmark.url)} for idx, bookmark in enumerate(all_bookmarks)]
     
-    bookmarks = find_specific_bookmarks(search, all_bookmarks)
+    specific_bookmarks = None
 
-    search_result = None
-    if bookmarks:
-        search_result = [{'title': bookmark.title, 'url': str(bookmark.url)} for bookmark in bookmarks]
-    else:
-        search_result = {'message': 'No bookmarks found'}
+    if tag:
+        specific_bookmarks = find_specific_bookmarks_by_tag_name(tag, all_bookmarks)
+        if search is not None:
+            specific_bookmarks = find_specific_bookmarks_by_search_string(search, specific_bookmarks)
+    elif search:
+        specific_bookmarks = find_specific_bookmarks_by_search_string(search, all_bookmarks)
 
-    return search_result
+    if specific_bookmarks:
+        return [{'title': bookmark.title, 'url': str(bookmark.url)} for bookmark in specific_bookmarks]
+
+    return {'message': 'No bookmarks found'}
 
 
 @app.post('/bookmarks/')
