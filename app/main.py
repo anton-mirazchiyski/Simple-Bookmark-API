@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from typing import Annotated
+from fastapi import FastAPI, Path
 
 from app.models import Bookmark
 from app.utils import extract_domain_name, find_specific_bookmarks_by_search_string, find_specific_bookmarks_by_tag_name, get_page_title_content
@@ -26,6 +27,12 @@ def get_bookmarks(tag: str | None = None, search: str | None = None):
         return [{'title': bookmark.title, 'url': str(bookmark.url)} for bookmark in specific_bookmarks]
 
     return {'message': 'No bookmarks found'}
+
+
+@app.get('/bookmarks/{bookmark_id}')
+def get_bookmark_by_id(bookmark_id: Annotated[int, Path(title='The ID of the bookmark to get', gt=0)]):
+    if all_bookmarks and bookmark_id <= len(all_bookmarks):
+        return all_bookmarks[bookmark_id - 1]
 
 
 @app.post('/bookmarks/')
